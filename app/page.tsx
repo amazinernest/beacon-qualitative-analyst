@@ -25,6 +25,10 @@ export default function HomePage() {
     methodologyVariations: "",
     participantDemographics: "",
     additionalNotes: "",
+    publicationFormat: false,
+    institution: "",
+    correspondingAuthor: "",
+    email: "",
   });
 
   async function onAnalyze() {
@@ -181,270 +185,770 @@ export default function HomePage() {
   }
 
   return (
-    <main style={{ padding: 24, maxWidth: 1100, margin: "0 auto" }}>
-      <h1 style={{ marginBottom: 8 }}>Beacon Qualitative Analyst</h1>
-      <p style={{ color: "#555", marginTop: 0 }}>
-        Paste multiple transcripts below. Separate interviews with a blank line.
-      </p>
+    <div style={{
+      minHeight: "100vh",
+      background: "linear-gradient(to bottom, #fafafa 0%, #ffffff 100%)",
+      fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Roboto', sans-serif",
+    }}>
+      {/* Header */}
+      <header style={{
+        background: "rgba(255, 255, 255, 0.8)",
+        backdropFilter: "blur(10px)",
+        borderBottom: "1px solid rgba(0, 0, 0, 0.05)",
+        position: "sticky",
+        top: 0,
+        zIndex: 100,
+        padding: "20px 0",
+      }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
+          <h1 style={{
+            margin: 0,
+            fontSize: "28px",
+            fontWeight: 700,
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            letterSpacing: "-0.5px",
+          }}>
+            Beacon Qualitative Analyst
+          </h1>
+          <p style={{
+            margin: "8px 0 0 0",
+            color: "#6b7280",
+            fontSize: "16px",
+            fontWeight: 400,
+          }}>
+            Transform research transcripts into academic-quality thematic analysis reports
+          </p>
+        </div>
+      </header>
 
-      <textarea
-        value={rawInput}
-        onChange={(e) => setRawInput(e.target.value)}
-        placeholder={`Paste transcripts here...\n\nExample:\nParticipant 1: I loved the onboarding but struggled with billing.\n\nParticipant 2: Billing was confusing; support helped, though onboarding was smooth.`}
-        style={{
-          width: "100%",
-          minHeight: 220,
-          padding: 12,
-          borderRadius: 8,
-          border: "1px solid #ccc",
-          fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-        }}
-      />
-
-      <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
-        <button
-          onClick={onAnalyze}
-          disabled={isAnalyzing || rawInput.trim().length === 0}
-          style={{
-            padding: "10px 16px",
-            background: "#111827",
-            color: "#fff",
-            border: 0,
-            borderRadius: 8,
-            cursor: isAnalyzing ? "progress" : "pointer",
-          }}
-        >
-          {isAnalyzing ? "Analyzing..." : "Analyze"}
-        </button>
-        <button
-          onClick={() => setShowReportForm(!showReportForm)}
-          disabled={rawInput.trim().length === 0}
-          style={{
-            padding: "10px 16px",
-            background: "#11182710",
+      {/* Main Content */}
+      <main style={{
+        maxWidth: 1200,
+        margin: "0 auto",
+        padding: "48px 24px",
+      }}>
+        {/* Hero Section */}
+        <section style={{
+          textAlign: "center",
+          marginBottom: "64px",
+        }}>
+          <h2 style={{
+            fontSize: "48px",
+            fontWeight: 800,
+            letterSpacing: "-1px",
+            margin: "0 0 16px 0",
             color: "#111827",
-            border: "1px solid #e5e7eb",
-            borderRadius: 8,
-            cursor: "pointer",
-          }}
-        >
-          {showReportForm ? "Hide report options" : "Generate report"}
-        </button>
-        <button
-          onClick={() => {
-            setRawInput("");
-            setResult(null);
-            setError(null);
-            setReportMd(null);
-            setShowReportForm(false);
-            setReportMeta({
-              title: "Qualitative Analysis Report",
-              author: "",
-              methodology: "",
-              methodologyVariations: "",
-              participantDemographics: "",
-              additionalNotes: "",
-            });
-          }}
-          style={{
-            padding: "10px 16px",
-            background: "#f3f4f6",
-            color: "#111827",
-            border: 0,
-            borderRadius: 8,
-            cursor: "pointer",
-          }}
-        >
-          Reset
-        </button>
-      </div>
+            lineHeight: "1.1",
+          }}>
+            Beautiful Thematic Analysis
+            <br />
+            <span style={{
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}>in Minutes</span>
+          </h2>
+          <p style={{
+            fontSize: "20px",
+            color: "#6b7280",
+            maxWidth: "600px",
+            margin: "0 auto 32px",
+            lineHeight: "1.6",
+          }}>
+            Import research transcripts and generate NVivo-style analysis reports with themes, quotes, and interpretations automatically.
+          </p>
+        </section>
 
-      {showReportForm && (
-        <div style={{ marginTop: 16, padding: 20, border: "1px solid #e5e7eb", borderRadius: 8, background: "#f9fafb" }}>
-          <h3 style={{ marginTop: 0 }}>Report metadata</h3>
-          <div style={{ display: "grid", gap: 12 }}>
-            <div>
-              <label style={{ display: "block", marginBottom: 4, fontWeight: 500 }}>Title</label>
-              <input
-                type="text"
-                value={reportMeta.title}
-                onChange={(e) => setReportMeta({ ...reportMeta, title: e.target.value })}
-                style={{ width: "100%", padding: 8, border: "1px solid #ccc", borderRadius: 4 }}
-              />
-            </div>
-            <div>
-              <label style={{ display: "block", marginBottom: 4, fontWeight: 500 }}>Author</label>
-              <input
-                type="text"
-                value={reportMeta.author}
-                onChange={(e) => setReportMeta({ ...reportMeta, author: e.target.value })}
-                placeholder="Research Team"
-                style={{ width: "100%", padding: 8, border: "1px solid #ccc", borderRadius: 4 }}
-              />
-            </div>
-            <div>
-              <label style={{ display: "block", marginBottom: 4, fontWeight: 500 }}>Methodology</label>
-              <textarea
-                value={reportMeta.methodology}
-                onChange={(e) => setReportMeta({ ...reportMeta, methodology: e.target.value })}
-                placeholder="Describe your analysis methodology..."
-                style={{ width: "100%", minHeight: 80, padding: 8, border: "1px solid #ccc", borderRadius: 4 }}
-              />
-            </div>
-            <div>
-              <label style={{ display: "block", marginBottom: 4, fontWeight: 500 }}>Methodology variations (optional)</label>
-              <textarea
-                value={reportMeta.methodologyVariations}
-                onChange={(e) => setReportMeta({ ...reportMeta, methodologyVariations: e.target.value })}
-                placeholder="Describe any variations or alternative approaches..."
-                style={{ width: "100%", minHeight: 60, padding: 8, border: "1px solid #ccc", borderRadius: 4 }}
-              />
-            </div>
-            <div>
-              <label style={{ display: "block", marginBottom: 4, fontWeight: 500 }}>Participant demographics (optional)</label>
-              <textarea
-                value={reportMeta.participantDemographics}
-                onChange={(e) => setReportMeta({ ...reportMeta, participantDemographics: e.target.value })}
-                placeholder="Age range, gender distribution, location, etc."
-                style={{ width: "100%", minHeight: 60, padding: 8, border: "1px solid #ccc", borderRadius: 4 }}
-              />
-            </div>
-            <div>
-              <label style={{ display: "block", marginBottom: 4, fontWeight: 500 }}>Additional notes (optional)</label>
-              <textarea
-                value={reportMeta.additionalNotes}
-                onChange={(e) => setReportMeta({ ...reportMeta, additionalNotes: e.target.value })}
-                placeholder="Any additional context, limitations, or considerations..."
-                style={{ width: "100%", minHeight: 60, padding: 8, border: "1px solid #ccc", borderRadius: 4 }}
-              />
-            </div>
+        {/* Input Section */}
+        <section style={{
+          background: "white",
+          borderRadius: "16px",
+          padding: "32px",
+          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1)",
+          marginBottom: "32px",
+          border: "1px solid rgba(0, 0, 0, 0.05)",
+        }}>
+          <label style={{
+            display: "block",
+            fontSize: "14px",
+            fontWeight: 600,
+            color: "#374151",
+            marginBottom: "12px",
+            textTransform: "uppercase",
+            letterSpacing: "0.5px",
+          }}>
+            Transcripts
+          </label>
+          <textarea
+            value={rawInput}
+            onChange={(e) => setRawInput(e.target.value)}
+            placeholder={`Paste your research transcripts here...\n\nSeparate different interviews with a blank line.\n\nExample:\n\nParticipant 1: I loved the onboarding process but struggled with billing.\n\nParticipant 2: Billing was confusing; support helped, though onboarding was smooth.`}
+            style={{
+              width: "100%",
+              minHeight: "280px",
+              padding: "20px",
+              borderRadius: "12px",
+              border: "2px solid #e5e7eb",
+              fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+              fontSize: "14px",
+              lineHeight: "1.6",
+              color: "#111827",
+              resize: "vertical",
+              transition: "all 0.2s ease",
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = "#667eea";
+              e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = "#e5e7eb";
+              e.currentTarget.style.boxShadow = "none";
+            }}
+          />
+
+          {/* Action Buttons */}
+          <div style={{
+            display: "flex",
+            gap: "12px",
+            marginTop: "20px",
+            flexWrap: "wrap",
+          }}>
             <button
-              onClick={onGenerateReport}
+              onClick={onAnalyze}
+              disabled={isAnalyzing || rawInput.trim().length === 0}
               style={{
-                padding: "10px 16px",
-                background: "#111827",
+                padding: "14px 28px",
+                background: isAnalyzing || rawInput.trim().length === 0
+                  ? "#d1d5db"
+                  : "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                 color: "#fff",
                 border: 0,
-                borderRadius: 8,
-                cursor: "pointer",
+                borderRadius: "10px",
+                fontSize: "15px",
+                fontWeight: 600,
+                cursor: isAnalyzing || rawInput.trim().length === 0 ? "not-allowed" : "pointer",
+                transition: "all 0.2s ease",
+                boxShadow: isAnalyzing || rawInput.trim().length === 0
+                  ? "none"
+                  : "0 4px 6px rgba(102, 126, 234, 0.25)",
+              }}
+              onMouseEnter={(e) => {
+                if (!isAnalyzing && rawInput.trim().length > 0) {
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow = "0 6px 12px rgba(102, 126, 234, 0.3)";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isAnalyzing && rawInput.trim().length > 0) {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "0 4px 6px rgba(102, 126, 234, 0.25)";
+                }
               }}
             >
-              Generate report
+              {isAnalyzing ? "Analyzing..." : "Analyze Transcripts"}
             </button>
-          </div>
-        </div>
-      )}
-
-      {error && (
-        <div style={{ marginTop: 16, color: "#b91c1c" }}>Error: {error}</div>
-      )}
-
-      {result && (
-        <div style={{ marginTop: 24, display: "grid", gap: 16 }}>
-          <section>
-            <h2 style={{ marginBottom: 8 }}>Codes (auto-generated)</h2>
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
-              gap: 12,
-            }}>
-              {result.codes.map((c) => (
-                <div key={c.code} style={{ border: "1px solid #e5e7eb", borderRadius: 8, padding: 12 }}>
-                  <div style={{ fontWeight: 600 }}>{c.code}</div>
-                  <div style={{ color: "#6b7280", fontSize: 12 }}>Frequency: {c.frequency}</div>
-                  <ul style={{ margin: "8px 0 0 16px", padding: 0 }}>
-                    {c.examples.slice(0, 3).map((ex, i) => (
-                      <li key={i} style={{ color: "#374151", fontSize: 13 }}>{ex}</li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section>
-            <h2 style={{ marginBottom: 8 }}>Themes</h2>
-            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-              {result.themes.map((t) => (
-                <div key={t.theme} style={{ border: "1px solid #e5e7eb", borderRadius: 8, padding: 12 }}>
-                  <div style={{ fontWeight: 600 }}>{t.theme}</div>
-                  <div style={{ color: "#6b7280" }}>{t.terms.join(", ")}</div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section>
-            <h2 style={{ marginBottom: 8 }}>Keyword extraction</h2>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {result.keywords.slice(0, 30).map((k) => (
-                <span key={k.term} style={{
-                  background: "#eef2ff",
-                  color: "#3730a3",
-                  borderRadius: 999,
-                  padding: "4px 10px",
-                  fontSize: 12,
-                }}>{k.term}</span>
-              ))}
-            </div>
-          </section>
-
-          <section>
-            <h2 style={{ marginBottom: 8 }}>Sentiment (per document)</h2>
-            <ul style={{ margin: 0, paddingLeft: 18 }}>
-              {result.sentiment.map((s) => (
-                <li key={s.documentId}>
-                  {s.documentId}: {s.score.toFixed(2)}
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          <section>
-            <h2 style={{ marginBottom: 8 }}>Code co-occurrence</h2>
-            <ul style={{ margin: 0, paddingLeft: 18 }}>
-              {result.cooccurrence.map((c, idx) => (
-                <li key={idx}>
-                  {c.a} × {c.b}: {c.count}
-                </li>
-              ))}
-            </ul>
-          </section>
-        </div>
-      )}
-
-      {reportMd && (
-        <section style={{ marginTop: 32 }}>
-          <h2 style={{ marginBottom: 8 }}>Report</h2>
-          <div style={{ display: "flex", gap: 12, marginBottom: 8, flexWrap: "wrap" }}>
             <button
-              onClick={onExportPDF}
-              style={{ padding: "8px 12px", border: "1px solid #e5e7eb", borderRadius: 6, background: "#111827", color: "#fff", cursor: "pointer" }}
+              onClick={() => setShowReportForm(!showReportForm)}
+              disabled={rawInput.trim().length === 0}
+              style={{
+                padding: "14px 28px",
+                background: rawInput.trim().length === 0 ? "#f3f4f6" : "white",
+                color: rawInput.trim().length === 0 ? "#9ca3af" : "#374151",
+                border: "2px solid #e5e7eb",
+                borderRadius: "10px",
+                fontSize: "15px",
+                fontWeight: 600,
+                cursor: rawInput.trim().length === 0 ? "not-allowed" : "pointer",
+                transition: "all 0.2s ease",
+              }}
+              onMouseEnter={(e) => {
+                if (rawInput.trim().length > 0) {
+                  e.currentTarget.style.borderColor = "#667eea";
+                  e.currentTarget.style.color = "#667eea";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (rawInput.trim().length > 0) {
+                  e.currentTarget.style.borderColor = "#e5e7eb";
+                  e.currentTarget.style.color = "#374151";
+                }
+              }}
             >
-              Export as PDF
+              {showReportForm ? "Hide Report Options" : "Generate Report"}
             </button>
             <button
               onClick={() => {
-                const blob = new Blob([reportMd], { type: "text/markdown;charset=utf-8" });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                a.href = url;
-                a.download = `${(reportMeta.title || "qualitative_report").replace(/[^a-z0-9]/gi, "_")}.md`;
-                a.click();
-                URL.revokeObjectURL(url);
+                setRawInput("");
+                setResult(null);
+                setError(null);
+                setReportMd(null);
+                setShowReportForm(false);
+                setReportMeta({
+                  title: "Qualitative Analysis Report",
+                  author: "",
+                  methodology: "",
+                  methodologyVariations: "",
+                  participantDemographics: "",
+                  additionalNotes: "",
+                  publicationFormat: false,
+                  institution: "",
+                  correspondingAuthor: "",
+                  email: "",
+                });
               }}
-              style={{ padding: "8px 12px", border: "1px solid #e5e7eb", borderRadius: 6, background: "#fff", cursor: "pointer" }}
+              style={{
+                padding: "14px 28px",
+                background: "transparent",
+                color: "#6b7280",
+                border: "2px solid #e5e7eb",
+                borderRadius: "10px",
+                fontSize: "15px",
+                fontWeight: 600,
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = "#ef4444";
+                e.currentTarget.style.color = "#ef4444";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = "#e5e7eb";
+                e.currentTarget.style.color = "#6b7280";
+              }}
             >
-              Download .md
+              Reset
             </button>
           </div>
-          <pre style={{ whiteSpace: "pre-wrap", background: "#f9fafb", border: "1px solid #e5e7eb", padding: 12, borderRadius: 8 }}>
-{reportMd}
-          </pre>
         </section>
-      )}
-    </main>
+
+        {/* Report Form */}
+        {showReportForm && (
+          <section style={{
+            background: "white",
+            borderRadius: "16px",
+            padding: "32px",
+            boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1)",
+            marginBottom: "32px",
+            border: "1px solid rgba(0, 0, 0, 0.05)",
+          }}>
+            <h3 style={{
+              marginTop: 0,
+              marginBottom: "24px",
+              fontSize: "24px",
+              fontWeight: 700,
+              color: "#111827",
+            }}>
+              Report Metadata
+            </h3>
+            <div style={{ display: "grid", gap: "20px" }}>
+              {/* Publication Format Toggle */}
+              <div style={{
+                padding: "16px",
+                background: "#f9fafb",
+                borderRadius: "10px",
+                border: "2px solid #e5e7eb",
+              }}>
+                <label style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  cursor: "pointer",
+                }}>
+                  <input
+                    type="checkbox"
+                    checked={reportMeta.publicationFormat}
+                    onChange={(e) => setReportMeta({ ...reportMeta, publicationFormat: e.target.checked })}
+                    style={{
+                      width: "18px",
+                      height: "18px",
+                      cursor: "pointer",
+                    }}
+                  />
+                  <span style={{
+                    fontSize: "15px",
+                    fontWeight: 600,
+                    color: "#111827",
+                  }}>
+                    Publication-ready format (Elsevier/Web of Science)
+                  </span>
+                </label>
+                <p style={{
+                  margin: "8px 0 0 30px",
+                  fontSize: "13px",
+                  color: "#6b7280",
+                }}>
+                  Generates a full academic paper structure with Abstract, Introduction, Methods, Results, Discussion, Conclusions, References, and appendices
+                </p>
+              </div>
+
+              {[
+                { key: "title", label: "Title", placeholder: "Qualitative Analysis Report" },
+                { key: "author", label: "Author(s)", placeholder: "Author Name" },
+                { key: "institution", label: "Institution (optional)", placeholder: "University Name" },
+                { key: "correspondingAuthor", label: "Corresponding Author", placeholder: "Name" },
+                { key: "email", label: "Email", placeholder: "author@university.edu", type: "email" },
+                { key: "methodology", label: "Methodology", textarea: true, placeholder: "Describe your analysis methodology (e.g., Thematic analysis following Braun and Clarke's 2006 approach)..." },
+                { key: "methodologyVariations", label: "Methodology Variations (optional)", textarea: true, placeholder: "Describe any variations or alternative approaches..." },
+                { key: "participantDemographics", label: "Participant Demographics", textarea: true, placeholder: "Age range, gender distribution, location, recruitment method, etc." },
+                { key: "additionalNotes", label: "Acknowledgments (optional)", textarea: true, placeholder: "Funding sources, acknowledgments, etc." },
+              ].map(({ key, label, placeholder, textarea, type }) => {
+                const value = reportMeta[key as keyof typeof reportMeta] as string;
+                return (
+                <div key={key}>
+                  <label style={{
+                    display: "block",
+                    fontSize: "14px",
+                    fontWeight: 600,
+                    color: "#374151",
+                    marginBottom: "8px",
+                  }}>
+                    {label}
+                  </label>
+                  {textarea ? (
+                    <textarea
+                      value={value || ""}
+                      onChange={(e) => setReportMeta({ ...reportMeta, [key]: e.target.value })}
+                      placeholder={placeholder}
+                      style={{
+                        width: "100%",
+                        minHeight: "100px",
+                        padding: "14px",
+                        borderRadius: "10px",
+                        border: "2px solid #e5e7eb",
+                        fontSize: "14px",
+                        fontFamily: "inherit",
+                        resize: "vertical",
+                        transition: "all 0.2s ease",
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = "#667eea";
+                        e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.borderColor = "#e5e7eb";
+                        e.currentTarget.style.boxShadow = "none";
+                      }}
+                    />
+                  ) : (
+                    <input
+                      type={type || "text"}
+                      value={value || ""}
+                      onChange={(e) => setReportMeta({ ...reportMeta, [key]: e.target.value })}
+                      placeholder={placeholder}
+                      style={{
+                        width: "100%",
+                        padding: "14px",
+                        borderRadius: "10px",
+                        border: "2px solid #e5e7eb",
+                        fontSize: "14px",
+                        fontFamily: "inherit",
+                        transition: "all 0.2s ease",
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = "#667eea";
+                        e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.borderColor = "#e5e7eb";
+                        e.currentTarget.style.boxShadow = "none";
+                      }}
+                    />
+                  )}
+                </div>
+              )})}
+              <button
+                onClick={onGenerateReport}
+                style={{
+                  padding: "14px 28px",
+                  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  color: "#fff",
+                  border: 0,
+                  borderRadius: "10px",
+                  fontSize: "15px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  boxShadow: "0 4px 6px rgba(102, 126, 234, 0.25)",
+                  marginTop: "8px",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow = "0 6px 12px rgba(102, 126, 234, 0.3)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "0 4px 6px rgba(102, 126, 234, 0.25)";
+                }}
+              >
+                Generate Report
+              </button>
+            </div>
+          </section>
+        )}
+
+        {/* Error Message */}
+        {error && (
+          <div style={{
+            background: "#fef2f2",
+            border: "1px solid #fecaca",
+            borderRadius: "12px",
+            padding: "16px 20px",
+            color: "#991b1b",
+            marginBottom: "32px",
+            fontSize: "14px",
+          }}>
+            <strong>Error:</strong> {error}
+          </div>
+        )}
+
+        {/* Results Section */}
+        {result && (
+          <div style={{ display: "grid", gap: "32px" }}>
+            {/* Codes */}
+            <section style={{
+              background: "white",
+              borderRadius: "16px",
+              padding: "32px",
+              boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1)",
+              border: "1px solid rgba(0, 0, 0, 0.05)",
+            }}>
+              <h2 style={{
+                marginTop: 0,
+                marginBottom: "24px",
+                fontSize: "24px",
+                fontWeight: 700,
+                color: "#111827",
+              }}>
+                Auto-Generated Codes
+              </h2>
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+                gap: "16px",
+              }}>
+                {result.codes.map((c) => (
+                  <div key={c.code} style={{
+                    background: "linear-gradient(135deg, #f9fafb 0%, #ffffff 100%)",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "12px",
+                    padding: "20px",
+                    transition: "all 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-4px)";
+                    e.currentTarget.style.boxShadow = "0 8px 16px rgba(0, 0, 0, 0.1)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                  >
+                    <div style={{
+                      fontWeight: 700,
+                      fontSize: "16px",
+                      color: "#111827",
+                      marginBottom: "8px",
+                    }}>
+                      {c.code}
+                    </div>
+                    <div style={{
+                      color: "#6b7280",
+                      fontSize: "13px",
+                      marginBottom: "12px",
+                    }}>
+                      Frequency: <strong>{c.frequency}</strong>
+                    </div>
+                    <ul style={{
+                      margin: 0,
+                      paddingLeft: "20px",
+                      listStyle: "disc",
+                    }}>
+                      {c.examples.slice(0, 3).map((ex, i) => (
+                        <li key={i} style={{
+                          color: "#4b5563",
+                          fontSize: "13px",
+                          marginTop: "6px",
+                          lineHeight: "1.5",
+                        }}>
+                          {ex.slice(0, 100)}{ex.length > 100 ? "..." : ""}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Themes */}
+            <section style={{
+              background: "white",
+              borderRadius: "16px",
+              padding: "32px",
+              boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1)",
+              border: "1px solid rgba(0, 0, 0, 0.05)",
+            }}>
+              <h2 style={{
+                marginTop: 0,
+                marginBottom: "24px",
+                fontSize: "24px",
+                fontWeight: 700,
+                color: "#111827",
+              }}>
+                Identified Themes
+              </h2>
+              <div style={{
+                display: "flex",
+                gap: "16px",
+                flexWrap: "wrap",
+              }}>
+                {result.themes.map((t) => (
+                  <div key={t.theme} style={{
+                    background: "linear-gradient(135deg, #667eea15 0%, #764ba215 100%)",
+                    border: "2px solid #667eea30",
+                    borderRadius: "12px",
+                    padding: "20px",
+                    minWidth: "200px",
+                    flex: "1 1 250px",
+                  }}>
+                    <div style={{
+                      fontWeight: 700,
+                      fontSize: "18px",
+                      color: "#667eea",
+                      marginBottom: "8px",
+                    }}>
+                      {t.theme.charAt(0).toUpperCase() + t.theme.slice(1)}
+                    </div>
+                    <div style={{
+                      color: "#6b7280",
+                      fontSize: "14px",
+                      lineHeight: "1.6",
+                    }}>
+                      {t.terms.slice(0, 5).join(", ")}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Keywords */}
+            <section style={{
+              background: "white",
+              borderRadius: "16px",
+              padding: "32px",
+              boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1)",
+              border: "1px solid rgba(0, 0, 0, 0.05)",
+            }}>
+              <h2 style={{
+                marginTop: 0,
+                marginBottom: "24px",
+                fontSize: "24px",
+                fontWeight: 700,
+                color: "#111827",
+              }}>
+                Top Keywords
+              </h2>
+              <div style={{
+                display: "flex",
+                gap: "10px",
+                flexWrap: "wrap",
+              }}>
+                {result.keywords.slice(0, 40).map((k) => (
+                  <span key={k.term} style={{
+                    background: "linear-gradient(135deg, #667eea20 0%, #764ba220 100%)",
+                    color: "#667eea",
+                    borderRadius: "20px",
+                    padding: "8px 16px",
+                    fontSize: "14px",
+                    fontWeight: 600,
+                    border: "1px solid #667eea30",
+                    transition: "all 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "scale(1.05)";
+                    e.currentTarget.style.background = "linear-gradient(135deg, #667eea30 0%, #764ba230 100%)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "scale(1)";
+                    e.currentTarget.style.background = "linear-gradient(135deg, #667eea20 0%, #764ba220 100%)";
+                  }}
+                  >
+                    {k.term}
+                  </span>
+                ))}
+              </div>
+            </section>
+
+            {/* Sentiment & Co-occurrence */}
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+              gap: "24px",
+            }}>
+              <section style={{
+                background: "white",
+                borderRadius: "16px",
+                padding: "24px",
+                boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1)",
+                border: "1px solid rgba(0, 0, 0, 0.05)",
+              }}>
+                <h3 style={{
+                  marginTop: 0,
+                  marginBottom: "16px",
+                  fontSize: "20px",
+                  fontWeight: 700,
+                  color: "#111827",
+                }}>
+                  Sentiment Analysis
+                </h3>
+                <ul style={{ margin: 0, paddingLeft: "20px", listStyle: "disc" }}>
+                  {result.sentiment.map((s) => (
+                    <li key={s.documentId} style={{
+                      color: "#4b5563",
+                      fontSize: "14px",
+                      marginTop: "8px",
+                    }}>
+                      {s.documentId}: <strong>{s.score.toFixed(2)}</strong>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+
+              <section style={{
+                background: "white",
+                borderRadius: "16px",
+                padding: "24px",
+                boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1)",
+                border: "1px solid rgba(0, 0, 0, 0.05)",
+              }}>
+                <h3 style={{
+                  marginTop: 0,
+                  marginBottom: "16px",
+                  fontSize: "20px",
+                  fontWeight: 700,
+                  color: "#111827",
+                }}>
+                  Code Co-occurrence
+                </h3>
+                <ul style={{ margin: 0, paddingLeft: "20px", listStyle: "disc" }}>
+                  {result.cooccurrence.slice(0, 10).map((c, idx) => (
+                    <li key={idx} style={{
+                      color: "#4b5563",
+                      fontSize: "14px",
+                      marginTop: "8px",
+                    }}>
+                      <strong>{c.a}</strong> × <strong>{c.b}</strong>: {c.count}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            </div>
+          </div>
+        )}
+
+        {/* Report Preview */}
+        {reportMd && (
+          <section style={{
+            background: "white",
+            borderRadius: "16px",
+            padding: "32px",
+            boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1)",
+            border: "1px solid rgba(0, 0, 0, 0.05)",
+            marginTop: "32px",
+          }}>
+            <div style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "24px",
+              flexWrap: "wrap",
+              gap: "12px",
+            }}>
+              <h2 style={{
+                margin: 0,
+                fontSize: "24px",
+                fontWeight: 700,
+                color: "#111827",
+              }}>
+                Generated Report
+              </h2>
+              <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+                <button
+                  onClick={onExportPDF}
+                  style={{
+                    padding: "12px 24px",
+                    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                    color: "#fff",
+                    border: 0,
+                    borderRadius: "10px",
+                    fontSize: "14px",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    boxShadow: "0 4px 6px rgba(102, 126, 234, 0.25)",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                    e.currentTarget.style.boxShadow = "0 6px 12px rgba(102, 126, 234, 0.3)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "0 4px 6px rgba(102, 126, 234, 0.25)";
+                  }}
+                >
+                  Export as PDF
+                </button>
+                <button
+                  onClick={() => {
+                    const blob = new Blob([reportMd], { type: "text/markdown;charset=utf-8" });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = `${(reportMeta.title || "qualitative_report").replace(/[^a-z0-9]/gi, "_")}.md`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                  }}
+                  style={{
+                    padding: "12px 24px",
+                    background: "white",
+                    color: "#374151",
+                    border: "2px solid #e5e7eb",
+                    borderRadius: "10px",
+                    fontSize: "14px",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = "#667eea";
+                    e.currentTarget.style.color = "#667eea";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = "#e5e7eb";
+                    e.currentTarget.style.color = "#374151";
+                  }}
+                >
+                  Download Markdown
+                </button>
+              </div>
+            </div>
+            <pre style={{
+              whiteSpace: "pre-wrap",
+              background: "#f9fafb",
+              border: "1px solid #e5e7eb",
+              padding: "24px",
+              borderRadius: "12px",
+              fontSize: "13px",
+              lineHeight: "1.7",
+              overflowX: "auto",
+              fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+            }}>
+              {reportMd}
+            </pre>
+          </section>
+        )}
+      </main>
+    </div>
   );
 }
-
-

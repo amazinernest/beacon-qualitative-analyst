@@ -17,6 +17,11 @@ export async function POST(req: NextRequest) {
       methodologyVariations: typeof body?.methodologyVariations === "string" ? body.methodologyVariations : undefined,
       participantDemographics: typeof body?.participantDemographics === "string" ? body.participantDemographics : undefined,
       additionalNotes: typeof body?.additionalNotes === "string" ? body.additionalNotes : undefined,
+      publicationFormat: typeof body?.publicationFormat === "boolean" ? body.publicationFormat : 
+                         typeof body?.publicationFormat === "string" ? body.publicationFormat === "true" : false,
+      institution: typeof body?.institution === "string" ? body.institution : undefined,
+      correspondingAuthor: typeof body?.correspondingAuthor === "string" ? body.correspondingAuthor : undefined,
+      email: typeof body?.email === "string" ? body.email : undefined,
     };
 
     const analysis = analyzeCorpus(documents);
