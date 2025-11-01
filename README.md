@@ -1,42 +1,80 @@
 # Beacon Qualitative Analyst
 
-A minimal Next.js full-stack app to import research transcripts and analyze responses using NVivo-like techniques (auto-coding, keyword extraction, code co-occurrence, simple themes, sentiment).
+A Next.js full-stack application for importing research transcripts and generating academic-quality thematic analysis reports. The app performs NVivo-style analysis including auto-coding, keyword extraction, code co-occurrence, sentiment analysis, and theme identification.
 
-## Quick start
+## Features
 
-1. Install deps
+- **Transcript Analysis**: Import multiple interview transcripts
+- **Academic Report Generation**: Generate research-ready thematic analysis reports with:
+  - Structured themes with descriptive summaries
+  - Subthemes identification
+  - Representative verbatim quotes with respondent IDs
+  - Narrative interpretations for each theme
+- **Export Options**: Download reports as Markdown or PDF
+- **Customizable Metadata**: Add title, author, methodology, demographics, and notes
+
+## Quick Start
+
+1. **Install dependencies**
 
 ```bash
 npm install
 ```
 
-2. Run the dev server
+2. **Run the development server**
 
 ```bash
 npm run dev
 ```
 
-3. Open the app
+3. **Open the app**
 
 - Visit `http://localhost:3000`
-- Paste transcripts separated by a blank line
-- Click "Analyze"
+- Paste transcripts (separate interviews with a blank line)
+- Click "Analyze" to see results
+- Click "Generate report" to create an academic thematic analysis report
 
-## Notes
+## Analysis Features
 
-- Analysis is local and heuristic (no external APIs). It performs:
-  - TF-IDF keyword extraction
-  - Auto-code generation using frequent 2-3 word phrases
-  - Co-occurrence counts across documents
-  - Simple lexicon-based sentiment
-  - Naive theme grouping by word stems
-- For real NVivo-like workflows (manual coding, codebooks, hierarchical themes, inter-rater reliability), extend the UI and persist data to a database.
+The app performs automated heuristic analysis including:
 
-## Project structure
+- **TF-IDF Keyword Extraction**: Identifies salient terms
+- **Auto-code Generation**: Creates codes from frequent 2-3 word phrases
+- **Code Co-occurrence**: Analyzes relationships between codes
+- **Sentiment Analysis**: Lexicon-based sentiment scoring
+- **Theme Grouping**: Identifies themes from word stems and patterns
+- **Academic Report Format**: Generates NVivo-style thematic analysis reports
 
-- `app/` Next.js App Router pages and API routes
-- `app/api/analyze/route.ts` analysis endpoint
-- `lib/analysis.ts` core analysis logic
+## Project Structure
+
+```
+├── app/
+│   ├── api/
+│   │   ├── analyze/route.ts    # Analysis API endpoint
+│   │   └── report/route.ts     # Report generation endpoint
+│   ├── layout.tsx              # Root layout
+│   └── page.tsx                # Main UI component
+├── lib/
+│   ├── analysis.ts            # Core analysis engine
+│   └── report.ts              # Academic report generator
+└── package.json
+```
+
+## Deployment
+
+### Deploy to Vercel
+
+1. Push your code to GitHub
+2. Import the repository on [Vercel](https://vercel.com)
+3. Deploy automatically
+
+### Deploy to GitHub Pages
+
+For static export (requires configuration adjustments):
+
+```bash
+npm run build
+```
 
 ## Production
 
@@ -44,3 +82,11 @@ npm run dev
 npm run build
 npm start
 ```
+
+## Limitations
+
+This is an automated, heuristic analysis tool intended to accelerate initial synthesis. For publication-grade studies, manual coding, inter-rater reliability checks, and triangulation with additional data sources are recommended.
+
+## License
+
+MIT
