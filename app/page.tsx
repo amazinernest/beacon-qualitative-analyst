@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { AIResults } from "@/components/AIResults";
 
 type AnalysisResponse = {
   documents: { id: string; text: string }[];
@@ -11,13 +12,36 @@ type AnalysisResponse = {
   themes: { theme: string; terms: string[] }[];
 };
 
+type AIAnalysisResponse = {
+  themes: {
+    name: string;
+    description: string;
+    subthemes: string[];
+    quotes: { text: string; respondentId: string; context: string }[];
+    prevalence: string;
+    significance: string;
+  }[];
+  keyFindings: string[];
+  patterns: {
+    name: string;
+    description: string;
+    examples: string[];
+  }[];
+  interpretations: string;
+  recommendations: string[];
+  methodologyNotes: string;
+};
+
 export default function HomePage() {
   const [rawInput, setRawInput] = useState("");
+  const [researchQuestion, setResearchQuestion] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<AnalysisResponse | null>(null);
+  const [aiResult, setAiResult] = useState<AIAnalysisResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [reportMd, setReportMd] = useState<string | null>(null);
   const [showReportForm, setShowReportForm] = useState(false);
+  const [analysisMode, setAnalysisMode] = useState<"basic" | "ai">("ai");
   const [reportMeta, setReportMeta] = useState({
     title: "Qualitative Analysis Report",
     author: "",
@@ -35,6 +59,7 @@ export default function HomePage() {
     setIsAnalyzing(true);
     setError(null);
     setResult(null);
+    setAiResult(null);
 
     try {
       const cleaned = rawInput
@@ -50,6 +75,7 @@ export default function HomePage() {
       if (!res.ok) throw new Error(await res.text());
       const json = (await res.json()) as AnalysisResponse;
       setResult(json);
+      setAnalysisMode("basic");
       setReportMd(null);
     } catch (e: any) {
       setError(e?.message || "Failed to analyze");
@@ -58,21 +84,75 @@ export default function HomePage() {
     }
   }
 
-  async function onGenerateReport() {
-    if (!rawInput.trim()) return;
+  async function onAIAnalyze() {
+    if (!researchQuestion.trim()) {
+      setError("Please enter a research question");
+      return;
+    }
+
+    setIsAnalyzing(true);
+    setError(null);
+    setResult(null);
+    setAiResult(null);
+
     try {
       const cleaned = rawInput
         .split(/\n\n+/)
         .map((s) => s.trim())
         .filter(Boolean);
-      const res = await fetch("/api/report", {
+
+      const res = await fetch("/api/ai-analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ documents: cleaned, ...reportMeta }),
+        body: JSON.stringify({ documents: cleaned, researchQuestion: researchQuestion.trim() }),
       });
       if (!res.ok) throw new Error(await res.text());
-      const text = await res.text();
-      setReportMd(text);
+      const json = (await res.json()) as AIAnalysisResponse;
+      setAiResult(json);
+      setAnalysisMode("ai");
+      setReportMd(null);
+    } catch (e: any) {
+      setError(e?.message || "Failed to analyze with AI");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  }
+
+  async function onGenerateReport() {
+    if (!rawInput.trim()) return;
+    
+    try {
+      const cleaned = rawInput
+        .split(/\n\n+/)
+        .map((s) => s.trim())
+        .filter(Boolean);
+      
+      if (analysisMode === "ai" && researchQuestion.trim()) {
+        // Generate AI-powered report
+        const res = await fetch("/api/ai-report", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            documents: cleaned, 
+            researchQuestion: researchQuestion.trim(),
+            ...reportMeta 
+          }),
+        });
+        if (!res.ok) throw new Error(await res.text());
+        const text = await res.text();
+        setReportMd(text);
+      } else {
+        // Generate basic heuristic report
+        const res = await fetch("/api/report", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ documents: cleaned, ...reportMeta }),
+        });
+        if (!res.ok) throw new Error(await res.text());
+        const text = await res.text();
+        setReportMd(text);
+      }
+      
       setShowReportForm(false);
     } catch (e: any) {
       setError(e?.message || "Failed to generate report");
@@ -218,7 +298,7 @@ export default function HomePage() {
             fontSize: "16px",
             fontWeight: 400,
           }}>
-            Transform research transcripts into academic-quality thematic analysis reports
+            AI-powered qualitative analysis for interview transcripts
           </p>
         </div>
       </header>
@@ -242,22 +322,22 @@ export default function HomePage() {
             color: "#111827",
             lineHeight: "1.1",
           }}>
-            Beautiful Thematic Analysis
+            Expert Qualitative Analysis
             <br />
             <span style={{
               background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
-            }}>in Minutes</span>
+            }}>Powered by AI</span>
           </h2>
           <p style={{
             fontSize: "20px",
             color: "#6b7280",
-            maxWidth: "600px",
+            maxWidth: "700px",
             margin: "0 auto 32px",
             lineHeight: "1.6",
           }}>
-            Import research transcripts and generate NVivo-style analysis reports with themes, quotes, and interpretations automatically.
+            Start with your research question, then let AI analyze your transcripts to generate comprehensive thematic analysis reports with themes, quotes, and expert interpretations.
           </p>
         </section>
 
@@ -270,6 +350,48 @@ export default function HomePage() {
           marginBottom: "32px",
           border: "1px solid rgba(0, 0, 0, 0.05)",
         }}>
+          {/* Research Question Input */}
+          <div style={{ marginBottom: "24px", background: "linear-gradient(135deg, #667eea10 0%, #764ba210 100%)", padding: "20px", borderRadius: "12px", border: "2px solid #667eea20" }}>
+            <label style={{
+              display: "block",
+              fontSize: "14px",
+              fontWeight: 700,
+              color: "#667eea",
+              marginBottom: "12px",
+              textTransform: "uppercase",
+              letterSpacing: "0.5px",
+            }}>
+              ① Research Question (Required for AI Analysis)
+            </label>
+            <input
+              type="text"
+              value={researchQuestion}
+              onChange={(e) => setResearchQuestion(e.target.value)}
+              placeholder="e.g., What are users' experiences with the product's onboarding process?"
+              style={{
+                width: "100%",
+                padding: "16px 20px",
+                borderRadius: "12px",
+                border: "2px solid #e5e7eb",
+                fontSize: "15px",
+                lineHeight: "1.6",
+                color: "#111827",
+                transition: "all 0.2s ease",
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = "#667eea";
+                e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = "#e5e7eb";
+                e.currentTarget.style.boxShadow = "none";
+              }}
+            />
+            <p style={{ margin: "10px 0 0 0", color: "#6b7280", fontSize: "13px", lineHeight: "1.5" }}>
+              💡 Tip: Be specific. Good questions guide AI to provide focused, relevant analysis.
+            </p>
+          </div>
+
           <label style={{
             display: "block",
             fontSize: "14px",
@@ -279,7 +401,7 @@ export default function HomePage() {
             textTransform: "uppercase",
             letterSpacing: "0.5px",
           }}>
-            Transcripts
+            ② Transcripts
           </label>
           <textarea
             value={rawInput}
@@ -316,11 +438,11 @@ export default function HomePage() {
             flexWrap: "wrap",
           }}>
             <button
-              onClick={onAnalyze}
-              disabled={isAnalyzing || rawInput.trim().length === 0}
+              onClick={onAIAnalyze}
+              disabled={isAnalyzing || rawInput.trim().length === 0 || researchQuestion.trim().length === 0}
               style={{
                 padding: "14px 28px",
-                background: isAnalyzing || rawInput.trim().length === 0
+                background: isAnalyzing || rawInput.trim().length === 0 || researchQuestion.trim().length === 0
                   ? "#d1d5db"
                   : "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                 color: "#fff",
@@ -328,26 +450,55 @@ export default function HomePage() {
                 borderRadius: "10px",
                 fontSize: "15px",
                 fontWeight: 600,
-                cursor: isAnalyzing || rawInput.trim().length === 0 ? "not-allowed" : "pointer",
+                cursor: isAnalyzing || rawInput.trim().length === 0 || researchQuestion.trim().length === 0 ? "not-allowed" : "pointer",
                 transition: "all 0.2s ease",
-                boxShadow: isAnalyzing || rawInput.trim().length === 0
+                boxShadow: isAnalyzing || rawInput.trim().length === 0 || researchQuestion.trim().length === 0
                   ? "none"
                   : "0 4px 6px rgba(102, 126, 234, 0.25)",
               }}
               onMouseEnter={(e) => {
-                if (!isAnalyzing && rawInput.trim().length > 0) {
+                if (!isAnalyzing && rawInput.trim().length > 0 && researchQuestion.trim().length > 0) {
                   e.currentTarget.style.transform = "translateY(-2px)";
                   e.currentTarget.style.boxShadow = "0 6px 12px rgba(102, 126, 234, 0.3)";
                 }
               }}
               onMouseLeave={(e) => {
-                if (!isAnalyzing && rawInput.trim().length > 0) {
+                if (!isAnalyzing && rawInput.trim().length > 0 && researchQuestion.trim().length > 0) {
                   e.currentTarget.style.transform = "translateY(0)";
                   e.currentTarget.style.boxShadow = "0 4px 6px rgba(102, 126, 234, 0.25)";
                 }
               }}
             >
-              {isAnalyzing ? "Analyzing..." : "Analyze Transcripts"}
+              {isAnalyzing ? "Analyzing with AI..." : "🤖 AI Analysis"}
+            </button>
+            <button
+              onClick={onAnalyze}
+              disabled={isAnalyzing || rawInput.trim().length === 0}
+              style={{
+                padding: "14px 28px",
+                background: isAnalyzing || rawInput.trim().length === 0 ? "#f3f4f6" : "white",
+                color: isAnalyzing || rawInput.trim().length === 0 ? "#9ca3af" : "#374151",
+                border: "2px solid #e5e7eb",
+                borderRadius: "10px",
+                fontSize: "15px",
+                fontWeight: 600,
+                cursor: isAnalyzing || rawInput.trim().length === 0 ? "not-allowed" : "pointer",
+                transition: "all 0.2s ease",
+              }}
+              onMouseEnter={(e) => {
+                if (!isAnalyzing && rawInput.trim().length > 0) {
+                  e.currentTarget.style.borderColor = "#667eea";
+                  e.currentTarget.style.color = "#667eea";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isAnalyzing && rawInput.trim().length > 0) {
+                  e.currentTarget.style.borderColor = "#e5e7eb";
+                  e.currentTarget.style.color = "#374151";
+                }
+              }}
+            >
+              Basic Analysis
             </button>
             <button
               onClick={() => setShowReportForm(!showReportForm)}
@@ -381,10 +532,13 @@ export default function HomePage() {
             <button
               onClick={() => {
                 setRawInput("");
+                setResearchQuestion("");
                 setResult(null);
+                setAiResult(null);
                 setError(null);
                 setReportMd(null);
                 setShowReportForm(false);
+                setAnalysisMode("ai");
                 setReportMeta({
                   title: "Qualitative Analysis Report",
                   author: "",
@@ -601,6 +755,11 @@ export default function HomePage() {
           }}>
             <strong>Error:</strong> {error}
           </div>
+        )}
+
+        {/* AI Results Section */}
+        {aiResult && (
+          <AIResults aiResult={aiResult} researchQuestion={researchQuestion} />
         )}
 
         {/* Results Section */}

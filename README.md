@@ -1,17 +1,34 @@
 # Beacon Qualitative Analyst
 
-A Next.js full-stack application for importing research transcripts and generating academic-quality thematic analysis reports. The app performs NVivo-style analysis including auto-coding, keyword extraction, code co-occurrence, sentiment analysis, and theme identification.
+A Next.js full-stack application for importing research transcripts and generating academic-quality thematic analysis reports. The app uses **AI-powered analysis** to provide expert-level qualitative research insights, as well as traditional NVivo-style heuristic analysis.
 
 ## Features
 
-- **Transcript Analysis**: Import multiple interview transcripts
-- **Academic Report Generation**: Generate research-ready thematic analysis reports with:
+### 🤖 AI-Powered Analysis (NEW!)
+- **Research Question-Driven**: Start with your research question to guide focused analysis
+- **Expert Thematic Analysis**: AI identifies themes, subthemes, and patterns
+- **Verbatim Quotes with Context**: Automatically extracts representative quotes with context
+- **Deep Interpretations**: Provides scholarly interpretations grounded in data
+- **Prevalence Tracking**: Shows how many respondents mentioned each theme
+- **Pattern Recognition**: Identifies relationships between themes
+- **Actionable Recommendations**: Suggests directions for future research
+
+### 📊 Traditional Heuristic Analysis
+- **TF-IDF Keyword Extraction**: Identifies salient terms
+- **Auto-code Generation**: Creates codes from frequent phrases
+- **Code Co-occurrence**: Analyzes relationships between codes
+- **Sentiment Analysis**: Lexicon-based sentiment scoring
+- **Theme Grouping**: Identifies themes from word stems and patterns
+
+### 📄 Report Generation
+- **Academic Report Format**: Generate research-ready thematic analysis reports with:
   - Structured themes with descriptive summaries
   - Subthemes identification
   - Representative verbatim quotes with respondent IDs
   - Narrative interpretations for each theme
 - **Export Options**: Download reports as Markdown or PDF
 - **Customizable Metadata**: Add title, author, methodology, demographics, and notes
+- **Publication-Ready Format**: Optional Elsevier/Web of Science-style output
 
 ## Quick Start
 
@@ -21,18 +38,48 @@ A Next.js full-stack application for importing research transcripts and generati
 npm install
 ```
 
-2. **Run the development server**
+2. **Set up environment variables**
+
+Create a `.env` file in the root directory:
+
+```bash
+cp .env.example .env
+```
+
+Add your **FREE** Google Gemini API key to the `.env` file:
+
+```
+GEMINI_API_KEY=your_gemini_api_key_here
+```
+
+**Get your FREE Gemini API key:**
+- Visit: [https://aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)
+- Sign in with your Google account
+- Click "Create API key"
+- Copy and paste it into your `.env` file
+
+**Free Tier Limits:**
+- 15 requests per minute
+- 1,500 requests per day
+- More than enough for research work!
+
+*Alternative: You can also use OpenAI (paid) by setting `OPENAI_API_KEY` instead*
+
+3. **Run the development server**
 
 ```bash
 npm run dev
 ```
 
-3. **Open the app**
+4. **Open the app**
 
 - Visit `http://localhost:3000`
+- **Enter your research question** (required for AI analysis)
 - Paste transcripts (separate interviews with a blank line)
-- Click "Analyze" to see results
+- Click **"🤖 AI Analysis"** for AI-powered thematic analysis
+- Or click **"Basic Analysis"** for traditional heuristic analysis
 - Click "Generate report" to create an academic thematic analysis report
+- Export as Markdown or PDF
 
 ## Analysis Features
 
